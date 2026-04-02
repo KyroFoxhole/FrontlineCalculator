@@ -166,6 +166,29 @@ function add(item, amount) {
     loadout[item] += amount;
 }
 
+// --- BASELINE FIX PHASE (CRITICAL) ---
+
+// Ensure enough rifles for players
+let missingRifles = Math.max(0, friendly - rifles);
+let rifleCratesNeeded = Math.ceil(missingRifles / 10); // ~10 rifles per crate
+
+if (rifleCratesNeeded > 0 && remaining > 0) {
+    let r = Math.min(remaining, rifleCratesNeeded);
+    add("Rifles", r);
+    remaining -= r;
+}
+
+// Ensure ammo sustain (3 mags per rifle target)
+let targetAmmo = friendly * 3;
+let missingAmmo = Math.max(0, targetAmmo - ammo);
+let ammoCratesNeeded = Math.ceil(missingAmmo / 30); // ~30 mags per crate
+
+if (ammoCratesNeeded > 0 && remaining > 0) {
+    let a = Math.min(remaining, ammoCratesNeeded);
+    add("Ammo", a);
+    remaining -= a;
+}
+
 // PRIORITY LOOP
 for (let p of priorities) {
     if (remaining <= 0) break;
