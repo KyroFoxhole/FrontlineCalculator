@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Foxhole Logi Assistant</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #1e1e1e;
+        color: #fff;
+        margin: 0;
+        padding: 20px;
+    }
+
+    h1 {
+        text-align: center;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: auto;
+        background: #2b2b2b;
+        padding: 20px;
+        border-radius: 10px;
+    }
+
+    label {
+        display: block;
+        margin-top: 10px;
+    }
+
+    input, select {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        border-radius: 5px;
+        border: none;
+    }
+
+    button {
+        margin-top: 20px;
+        width: 100%;
+        padding: 12px;
+        background: #4CAF50;
+        border: none;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+    button:hover {
+        background: #45a049;
+    }
+
+    .output {
+        margin-top: 20px;
+        background: #111;
+        padding: 15px;
+        border-radius: 8px;
+    }
+
+    .priority {
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+</style>
+</head>
+
+<body>
+
+<h1>Foxhole Logi Assistant</h1>
+
+<div class="container">
+
+    <label>Friendly Players</label>
+    <input id="friendly" type="number">
+
+    <label>Enemy Players</label>
+    <input id="enemy" type="number">
+
+    <label>Enemy Armor Present?</label>
+    <select id="enemyArmor">
+        <option value="no">No</option>
+        <option value="yes">Yes</option>
+    </select>
+
+    <label>Shirts</label>
+    <input id="shirts" type="number">
+
+    <label>Rifles</label>
+    <input id="rifles" type="number">
+
+    <label>Ammo</label>
+    <input id="ammo" type="number">
+
+    <label>Throw AT (Stickies/Flasks)</label>
+    <input id="throwAT" type="number">
+
+    <label>Ranged AT (RPG/ATRPG)</label>
+    <input id="rangedAT" type="number">
+
+    <label>BMATs</label>
+    <input id="bmats" type="number">
+
+    <label>Bandages/Plasma</label>
+    <input id="meds" type="number">
+
+    <label>Transport Type</label>
+    <select id="transport">
+        <option value="truck">Truck (~15 crates)</option>
+        <option value="flatbed">Flatbed (~60 crates)</option>
+    </select>
+
+    <button onclick="calculate()">Generate Loadout</button>
+
+    <div class="output" id="output"></div>
+
+</div>
+
+<script>
+function calculate() {
+    let shirts = parseInt(document.getElementById("shirts").value) || 0;
+    let rifles = parseInt(document.getElementById("rifles").value) || 0;
+    let ammo = parseInt(document.getElementById("ammo").value) || 0;
+    let throwAT = parseInt(document.getElementById("throwAT").value) || 0;
+    let rangedAT = parseInt(document.getElementById("rangedAT").value) || 0;
+    let bmats = parseInt(document.getElementById("bmats").value) || 0;
+    let meds = parseInt(document.getElementById("meds").value) || 0;
+    let enemyArmor = document.getElementById("enemyArmor").value;
+    let transport = document.getElementById("transport").value;
+
+    let capacity = (transport === "flatbed") ? 60 : 15;
+
+    let priorities = [];
+
+    // Determine priority
+    if (shirts < 75) priorities.push("shirts");
+    if (enemyArmor === "yes" && (throwAT + rangedAT < 30)) priorities.push("at");
+    if (bmats < 300) priorities.push("bmats");
+    if (meds < 20) priorities.push("meds");
+    if (rifles < 100 || ammo < 100) priorities.push("weapons");
+
+    let loadout = {};
+
+    function add(item, amount) {
+        if (!loadout[item]) loadout[item] = 0;
+        loadout[item] += amount;
+    }
+
+    let remaining = capacity;
+
+    for (let p of priorities) {
+        if (remaining <= 0) break;
+
+        switch(p) {
+            case "shirts":
+                let s = Math.min(remaining, 8);
+                add("Shirts", s);
+                remaining -= s;
+                break;
+
+            case "at":
+                let a = Math.min(remaining, 6);
+                add("Stickies", a);
+                remaining -= a;
+
+                if (remaining > 0) {
+                    let r = Math.min(remaining, 4);
+                    add("RPG Rockets", r);
+                    remaining -= r;
+                }
+                break;
+
+            case "bmats":
+                let b = Math.min(remaining, 6);
+                add("BMATs", b);
+                remaining -= b;
+                break;
+
+            case "meds":
+                let m = Math.min(remaining, 4);
+                add("Bandages/Plasma", m);
+                remaining -= m;
+                break;
+
+            case "weapons":
+                let w = Math.min(remaining, 6);
+                add("Rifles", w);
+                remaining -= w;
+
+                if (remaining > 0) {
+                    let am = Math.min(remaining, 4);
+                    add("Ammo", am);
+                    remaining -= am;
+                }
+                break;
+        }
+    }
+
+    let priorityText = priorities.length > 0 ? priorities[0].toUpperCase() : "STABLE";
+
+    let output = `<div class="priority">Primary Priority: ${priorityText}</div>`;
+    output += "<b>Recommended Loadout:</b><br>";
+
+    for (let item in loadout) {
+        output += `${item}: ${loadout[item]} crates<br>`;
+    }
+
+    if (remaining > 0) {
+        output += `<br>Unused Capacity: ${remaining} crates`;
+    }
+
+    document.getElementById("output").innerHTML = output;
+}
+</script>
+
+</body>
+</html>
