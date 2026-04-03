@@ -477,12 +477,3 @@ class LogisticsTransport {
 // EXPORTS
 // ============================================================
 
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        CombatSimulator,
-        WeaponConfiguration,
-        ResourceConsumptionModel,
-        ResourceSimulation,
-        LogisticsTransport
-    };
-}

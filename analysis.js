@@ -350,10 +350,3 @@ class EfficiencyCalculator {
 // EXPORTS
 // ============================================================
 
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        FrontlineAnalyzer,
-        PriorityEngine,
-        EfficiencyCalculator
-    };
-}

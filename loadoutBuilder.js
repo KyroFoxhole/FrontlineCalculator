@@ -192,9 +192,3 @@ class TripPlanner {
 // EXPORTS
 // ============================================================
 
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        LoadoutOptimizer,
-        TripPlanner
-    };
-}
