@@ -3,32 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Frontline Calculator</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Foxhole Logi Assistant</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="simulation.js"></script>
+    <script src="analysis.js"></script>
+    <script src="loadoutBuilder.js"></script>
 </head>
 <body>
-    <header>
-        <h1>Frontline Calculator</h1>
-    </header>
-    <main>
-        <input type="text" id="inputData" placeholder="Enter your data">
-        <button id="analyzeButton">Analyze</button>
-        <div id="resultContainer"></div>
-    </main>
-    <footer>
-        <p>&copy; 2026 Frontline Calculator</p>
-    </footer>
+    <div class="container">
+        <h1>Foxhole Logi Assistant</h1>
+        <form id="logi-form">
+            <h2>Input Fields</h2>
+            <label for="friendly-players">Friendly Players:</label>
+            <input type="number" id="friendly-players" name="friendly-players">
+            <label for="enemy-players">Enemy Players:</label>
+            <input type="number" id="enemy-players" name="enemy-players">
+            <label for="enemy-armor">Enemy Armor:</label>
+            <select id="enemy-armor" name="enemy-armor">
+                <option value="none">None</option>
+                <option value="light">Light</option>
+                <option value="medium">Medium</option>
+                <option value="heavy">Heavy</option>
+            </select>
+            <label for="transport-type">Transport Type:</label>
+            <select id="transport-type" name="transport-type">
+                <option value="none">None</option>
+                <option value="standard">Standard</option>
+                <option value="armored">Armored</option>
+            </select>
+            <label for="shirts">Shirts:</label>
+            <input type="number" id="shirts" name="shirts">
+            <label for="rifles">Rifles:</label>
+            <input type="number" id="rifles" name="rifles">
+            <label for="ammo">Ammo:</label>
+            <input type="number" id="ammo" name="ammo">
+            <label for="throw-at">Throw AT:</label>
+            <input type="number" id="throw-at" name="throw-at">
+            <label for="ranged-at">Ranged AT:</label>
+            <input type="number" id="ranged-at" name="ranged-at">
+            <label for="bmat">BMATs:</label>
+            <input type="number" id="bmat" name="bmat">
+            <label for="meds">Meds:</label>
+            <input type="number" id="meds" name="meds">
+            <button type="button" id="analyze-btn">Analyze</button>
+        </form>
+        <div id="analysis-results"></div>
+        <div class="cards">
+            <h2>Critical Timeline</h2>
+            <div class="card"></div>
+            <h2>Resource Ratios</h2>
+            <div class="card"></div>
+            <h2>Strategic Assessment</h2>
+            <div class="card"></div>
+            <h2>Recommended Loadout</h2>
+            <div class="card"></div>
+            <h2>Key Recommendations</h2>
+            <div class="card"></div>
+            <h2>Critical Events</h2>
+            <div class="card"></div>
+            <h2>Multi-Trip Logistics</h2>
+            <div class="card"></div>
+        </div>
+    </div>
     <script>
-        document.getElementById('analyzeButton').addEventListener('click', function() {
-            const inputData = document.getElementById('inputData').value;
-            analyzeData(inputData);
+        document.getElementById('analyze-btn').addEventListener('click', function() {
+            try {
+                const priorities = PriorityEngine.determinePriorities();
+                const needs = PriorityEngine.calculateNeeds();
+                const loadout = LoadoutOptimizer.buildLoadout(priorities, needs);
+                document.getElementById('analysis-results').innerHTML = JSON.stringify(loadout, null, 2);
+            } catch (error) {
+                console.error('An error occurred during analysis:', error);
+            }
         });
-
-        function analyzeData(data) {
-            // Placeholder for analysis logic
-            const result = `Analyzed data: ${data}`;
-            document.getElementById('resultContainer').innerText = result;
-        }
     </script>
 </body>
 </html>
