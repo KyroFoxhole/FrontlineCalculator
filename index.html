@@ -899,48 +899,39 @@ class FrontlineAnalyzer {
 // LOADOUT OPTIMIZER
 // ============================================================
 class LoadoutOptimizer {
-    static CRATE_SIZES = {
-        'Shirts': 10,
-        'Ammo': 30,
-        'Meds': 10,
-        'Stickies': 6,
-        'RPG Rockets': 4,
-        'BMATs': 50
-    };
+    constructor() {
+        this.transportCapacity = 100; // Example capacity
+        this.supplies = [];
+    }
 
-    static buildLoadout(capacity, state, simulation) {
-        const loadout = {};
-        let remaining = capacity;
+    optimizeLoadout(criticalNeeds, secondaryResources) {
+        const loadedSupplies = [];
+        let usedCapacity = 0;
 
-        // Priority order based on failures
-        const priorities = [];
-        if (simulation.failures.shirts) priorities.push({ item: 'Shirts', need: 80 });
-        if (simulation.failures.ammo) priorities.push({ item: 'Ammo', need: 90 });
-        if (simulation.combat.armorPressure > 50) {
-            priorities.push({ item: 'Stickies', need: 30 });
-            priorities.push({ item: 'RPG Rockets', need: 20 });
-        }
-        if (!simulation.failures.shirts && state.shirts < 50) {
-            priorities.push({ item: 'Shirts', need: 50 });
-        }
-        if (!simulation.failures.ammo && state.ammo < 60) {
-            priorities.push({ item: 'Ammo', need: 60 });
-        }
-        if (state.meds < 40) priorities.push({ item: 'Meds', need: 30 });
-        if (state.bmats < 300) priorities.push({ item: 'BMATs', need: 150 });
-
-        // Fill loadout
-        for (let p of priorities) {
-            if (remaining <= 0) break;
-            const cratesNeeded = Math.ceil(p.need / this.CRATE_SIZES[p.item]);
-            const crates = Math.min(remaining, cratesNeeded);
-            if (crates > 0) {
-                loadout[p.item] = (loadout[p.item] || 0) + crates;
-                remaining -= crates;
+        // Fill with critical needs first
+        for (const supply of criticalNeeds) {
+            if (usedCapacity + supply.amount <= this.transportCapacity) {
+                loadedSupplies.push(supply);
+                usedCapacity += supply.amount;
             }
         }
 
-        return { loadout, remaining, utilization: ((capacity - remaining) / capacity) * 100 };
+        // Fill remaining capacity with secondary resources
+        for (const supply of secondaryResources) {
+            while (usedCapacity < this.transportCapacity && supply.amount > 0) {
+                loadedSupplies.push(supply);
+                usedCapacity += supply.amount;
+                supply.amount--;
+            }
+        }
+
+        // Fill any remaining space with surplus ammo if necessary
+        while (usedCapacity < this.transportCapacity) {
+            loadedSupplies.push({ type: 'Surplus Ammo', amount: 1 });
+            usedCapacity++;
+        }
+
+        return loadedSupplies;
     }
 }
 
