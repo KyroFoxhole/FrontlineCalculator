@@ -5,31 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Frontline Calculator</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="simulation.js"></script>
-    <script src="analysis.js"></script>
-    <script src="loadoutBuilder.js"></script>
 </head>
 <body>
-    <div id="app">
+    <header>
         <h1>Frontline Calculator</h1>
-        <!-- Other HTML content -->
-        <button id="analyzeButton">Analyze Frontline</button>
-    </div>
+    </header>
+    <main>
+        <input type="text" id="inputData" placeholder="Enter your data">
+        <button id="analyzeButton">Analyze</button>
+        <div id="resultContainer"></div>
+    </main>
+    <footer>
+        <p>&copy; 2026 Frontline Calculator</p>
+    </footer>
     <script>
-        function initialize() {
-            // Initialization code
-            window.analyzeNow = function() {
-                const needs = {}; // Gather needs here
-                const priorities = PriorityEngine.determinePriorities();
-                const needsObject = PriorityEngine.calculateNeeds();
-                LoadoutOptimizer.buildLoadout(needsObject);
-            };
+        document.getElementById('analyzeButton').addEventListener('click', function() {
+            const inputData = document.getElementById('inputData').value;
+            analyzeData(inputData);
+        });
 
-            document.getElementById('analyzeButton').addEventListener('click', window.analyzeNow);
-            // Removed duplicate event listeners
+        function analyzeData(data) {
+            // Placeholder for analysis logic
+            const result = `Analyzed data: ${data}`;
+            document.getElementById('resultContainer').innerText = result;
         }
-
-        window.onload = initialize;
     </script>
 </body>
 </html>
