@@ -569,9 +569,16 @@
 </div>
 
 <script>
+
 // ============================================================
-// IMPORT EXTERNAL MODULES
+// Utility Functions
 // ============================================================
+function sanitizeResource(val) {
+    // Prevents NaN and negative values, ensures a number
+    var num = Number(val);
+    if (isNaN(num) || num < 0) return 0;
+    return num;
+}
 </script>
 <!-- Move scripts to end of body for correct load order -->
 </div>
@@ -583,21 +590,17 @@
 window.onload = function() {
     // Attach event handler for Analyze Frontline button
 
+
     // Show test message on page load
     var output = document.getElementById("outputSection");
     if (output) {
         output.innerHTML = '<div style="color:#4CAF50;">[Test] Page loaded, outputSection is accessible.</div>';
     }
 
-    // Attach event handler for Analyze Frontline button
+    // Attach event handler for Analyze Frontline button (no inline onclick)
     var analyzeBtn = document.getElementById('analyzeBtn');
     if (analyzeBtn) {
-        analyzeBtn.onclick = function() {
-            if (output) {
-                output.innerHTML = '<div style="color:#2196F3;">[Test] Analyze button clicked.</div>';
-            }
-            window.analyzeNow();
-        };
+        analyzeBtn.onclick = window.analyzeNow;
     }
 
     window.analyzeNow = function() {
@@ -632,6 +635,14 @@ window.onload = function() {
             output.innerHTML = '<div style="color: #f44336; padding: 30px; background: #2b2b2b; border-radius: 8px;">❌ <b>Error:</b> ' + (err && err.message ? err.message : err) + '<br><pre style="color:#ff9800; margin-top:10px;">' + (err && err.stack ? err.stack : '') + '</pre></div>';
         }
     }
+
+    // Auto-calculate on change (attach after all functions are defined)
+    ['friendly', 'enemy', 'enemyArmor', 'transport'].forEach(id => {
+        var el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('change', window.analyzeNow);
+        }
+    });
 
     window.renderAnalysis = function(state) {
     const sim = new ResourceSimulation(state);
